@@ -118,7 +118,8 @@ log into the new tasmota wifi hotspot and configure your wifi, once completed th
 open its ip address in a web browser, now the tasmota config can begin.
 
 Configure Tasmota in this fashion.
-![tasmota config](/pictures/tasmota/tasmota configure.PNG)
+
+![config](/pictures/tasmota/tasmota_config.png)
 
 now we need to do some console configure
 
