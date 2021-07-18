@@ -24,6 +24,9 @@ and thankfully we have all the pins we need ladled on the board, very nice of Eu
 Even with my shonkey soldering skills I managed to get the 5 wires we need connected.
 3.3V, GND, TX, RX, GPIO0.
 
+3 are on one side, 2 on the other side
+yes I did check for shorts and cleaned up those loose wires!!
+
 ![wire one](/pictures/RoboVac/wires1.jpg)
 
 I also decided I would keep these wires connected just in case I needed to flash this back to stock, or something went horribly wrong.
