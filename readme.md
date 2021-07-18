@@ -14,15 +14,17 @@ As mentioned previous foray into Eufy RoboVac modding/hacking for the 11S I foun
 
 Now there are already projects to integrate Eufy Robovacs into HA, https://github.com/mitchellrj/eufy_robovac being the most popular I could find, however these still rely on the Tuya component being present and piggybacking off that, I wanted a more basic solution which could rip out any chance of the Tuya cloud messing things about in the future, so I got my screwdriver kit out and my soldering iron and got to disassembling the robot!
 
+![open RoboVac](/pictures/RoboVac/robo1.jpg)
+
 Opening up the Robot it is very clear where the WiFi module is.
 and thankfully we have all the pins we need ladled on the board, very nice of Eufy to do that for us ;)
 
-![open RoboVac](/pictures/RoboVac/robo1.jpg)
+![wifi module](/pictures/RoboVac/wificard.jpg)
 
 Even with my shonkey soldering skills I managed to get the 5 wires we need connected.
 3.3V, GND, TX, RX, GPIO0.
 
-![wire one](/pictures/RoboVac/wrires1.jpg)
+![wire one](/pictures/RoboVac/wires1.jpg)
 
 I also decided I would keep these wires connected just in case I needed to flash this back to stock, or something went horribly wrong.
 
