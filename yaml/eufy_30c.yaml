@@ -1,0 +1,251 @@
+esphome:
+  name: eufy_30c
+  platform: ESP8266
+  board: esp01_1m # the actual device you have, used for pin mapping.
+
+# wifi details in here
+<<: !include ./secrets.yaml
+
+# this says if wifi is lost make an AP with a web page to add new wifi details
+captive_portal:
+
+api:
+
+logger:
+  level: DEBUG
+  baud_rate: 0  # disable uart logger as tuya needs that
+
+uart:
+  rx_pin: GPIO13
+  tx_pin: GPIO15
+  baud_rate: 115200  # this will thow and error in the logs, but it works
+
+# register HA time component
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+# Register the Tuya MCU connection
+tuya:
+  time_id: homeassistant_time
+
+# these are the data points found.
+#Datapoint 1: switch (value: ON)
+#Datapoint 2: switch (value: OFF)
+#Datapoint 3: enum (value: 0)
+#Datapoint 5: enum (value: 4)
+#Datapoint 15: enum (value: 4)
+#Datapoint 101: switch (value: OFF)
+#Datapoint 102: enum (value: 3)
+#Datapoint 103: switch (value: OFF)
+#Datapoint 104: int value (value: 100)
+#Datapoint 106: enum (value: 0)
+#Product: '{"p":"UceA1fpIZIAySN6U","v":"1.1.7","m":0}'
+
+# set the sensors
+sensor:
+  - platform: "tuya"
+    name: "Eufy_30c_status"
+    id: Eufy_30c_status
+    sensor_datapoint: 15
+      # status 0 = cleaning/busy
+      # status 1 = idle/ready
+      # status 2 = sleeping
+      # status 3 = charging
+      # status 4 = charged
+  - platform: "tuya"
+    name: "Eufy_30c_Battery_percent"
+    sensor_datapoint: 104
+  - platform: "tuya"
+    name: "Eufy_30c_clean_mode"
+    id: Eufy_30c_clean_mode
+    internal: True
+    sensor_datapoint: 5
+      # status 0 = auto
+      # status 1 = 30 mins
+      # status 2 = spot
+      # status 3 = edges
+      # status 4 = idle
+  - platform: "tuya"
+    name: "Eufy_30c_clean_speed"
+    id: Eufy_30c_clean_speed
+    internal: True
+    sensor_datapoint: 102
+      # status 0 = standard
+      # status 1 = boostIQ
+      # status 2 = max
+  - platform: "tuya"
+    name: "Eufy_30c_error_codes"
+    id: Eufy_30c_error_codes
+    sensor_datapoint: 106
+      # status 0 = no error
+      # status 1 = 
+      # status 2 = 
+      # status 3 = cliff/edge error?
+      # status 4 = 
+
+# the simple binary switches are easy
+switch:
+  - platform: "tuya"
+    name: "Eufy_30c_cleaning"
+    switch_datapoint: 2
+  - platform: "tuya"
+    name: "Eufy_30c_going_home"
+    switch_datapoint: 101
+  - platform: "tuya"
+    name: "Eufy_30c_locate"
+    switch_datapoint: 103
+
+# the Enum switches are harder
+# looking at the info here https://www.dhumpf.de/?tag=robovac-30c
+# and the code here https://github.com/mitchellrj/eufy_robovac
+# we can guestimate some of the enums
+
+# thanks to this comment here revealing the 'set_datapoint_value' method, we can set these enums as switches
+# https://github.com/esphome/feature-requests/issues/470#issuecomment-823924083
+
+# set the clean action
+  - platform: template
+    name: "Eufy_30c_spot_clean" #spot clean
+    lambda: |-
+      if (id(Eufy_30c_clean_mode).state ==2) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      - lambda: |-
+          tuya_tuya->set_datapoint_value(5, 0x2);
+  - platform: template
+    name: "Eufy_30c_single_room" #30 mins
+    lambda: |-
+      if (id(Eufy_30c_clean_mode).state ==1) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      - lambda: |-
+          tuya_tuya->set_datapoint_value(5, 0x1);
+  - platform: template
+    name: "Eufy_30c_edge_clean" #edges
+    lambda: |-
+      if (id(Eufy_30c_clean_mode).state ==3) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      - lambda: |-
+          tuya_tuya->set_datapoint_value(5, 0x3);
+  - platform: template
+    name: "Eufy_30c_auto_clean" #auto
+    lambda: |-
+      if (id(Eufy_30c_clean_mode).state ==0) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      - lambda: |-
+          tuya_tuya->set_datapoint_value(5, 0x0);
+
+# set the clean power
+  - platform: template
+    name: "Eufy_30c_power_standard" #standard
+    lambda: |-
+      if (id(Eufy_30c_clean_speed).state ==0) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      - lambda: |-
+          tuya_tuya->set_datapoint_value(102, 0x0);
+
+  - platform: template
+    name: "Eufy_30c_power_boostIQ" #boost
+    lambda: |-
+      if (id(Eufy_30c_clean_speed).state ==1) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      - lambda: |-
+          tuya_tuya->set_datapoint_value(102, 0x1);
+
+  - platform: template
+    name: "Eufy_30c_power_max" #max
+    lambda: |-
+      if (id(Eufy_30c_clean_speed).state ==2) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      - lambda: |-
+          tuya_tuya->set_datapoint_value(102, 0x2);
+
+# set the direct control, not very useful in current form, but I wanted to include for the sake of completeness
+# in order to get these to work as expected, I hacked esphome/components/tuya/tuya.cpp
+# comenting out lines 408-411
+# if (datapoint->value_uint == value) {
+#   ESP_LOGV(TAG, "Not sending unchanged value");
+#   return;
+# }
+# so we can set datapoint to its same value more than once
+# if you're wondering where this source code is on your machine, you can find it here
+# ESPHome\venv\Lib\site-packages\esphome\components\tuya
+# assuming windows OS
+  - platform: template
+    name: "Eufy_30c_move_fwd" 
+    turn_on_action:
+      - lambda: |-
+          tuya_tuya->set_datapoint_value(3, 0x0);
+  - platform: template
+    name: "Eufy_30c_move_back" 
+    turn_on_action:
+      - lambda: |-
+          tuya_tuya->set_datapoint_value(3, 0x1);
+  - platform: template
+    name: "Eufy_30c_move_left" 
+    turn_on_action:
+      - lambda: |-
+          tuya_tuya->set_datapoint_value(3, 0x2);
+  - platform: template
+    name: "Eufy_30c_move_right" 
+    turn_on_action:
+      - lambda: |-
+          tuya_tuya->set_datapoint_value(3, 0x3);
+
+# publish a text sensor for a human redable status
+      # status 0 = cleaning/busy
+      # status 1 = idle/ready
+      # status 2 = sleeping
+      # status 3 = charging
+      # status 4 = charged
+text_sensor:
+  - platform: template
+    name: "robot status"
+    lambda: |-
+      if (id(Eufy_30c_status).state ==0){
+        return {"cleaning"};
+      }
+      if (id(Eufy_30c_status).state ==1){
+        return {"idle/ready"};
+      }
+      if (id(Eufy_30c_status).state ==2){
+        return {"sleeping"};
+      }
+      if (id(Eufy_30c_status).state ==3){
+        return {"charging"};
+      }
+      if (id(Eufy_30c_status).state ==3){
+        return {"fully charged"};
+      }
+      if (id(Eufy_30c_error_codes).state >0){
+        return {"ERROR! help the robot!"};
+      }
+
+    update_interval: 5s
