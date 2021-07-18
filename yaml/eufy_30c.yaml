@@ -241,7 +241,7 @@ text_sensor:
       if (id(Eufy_30c_status).state ==3){
         return {"charging"};
       }
-      if (id(Eufy_30c_status).state ==3){
+      if (id(Eufy_30c_status).state ==4){
         return {"fully charged"};
       }
       if (id(Eufy_30c_error_codes).state >0){
