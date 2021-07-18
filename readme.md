@@ -119,7 +119,7 @@ open its ip address in a web browser, now the tasmota config can begin.
 
 Configure Tasmota in this fashion.
 
-![config](/pictures/tasmota/tasmota_config.png)
+![config](/pictures/tasmota/tasmota_config.PNG)
 
 now we need to do some console configure
 
