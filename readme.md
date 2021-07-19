@@ -174,23 +174,24 @@ The commands captured by Heir Dumfp are as follows
 ~~~~
 
 __Creating some Tasmota mapping__
+this maps 'Relay1' (fnId 11) to dpId 2 (Start/Stop)
 ~~~~
 TuyaMCU 11,2
 ~~~~
-this maps 'Relay1' (fnId 11) to dpId 2 (Start/Stop)
+this maps 'Relay2' (fnId 12) to dpId 101 (Go Home)
 ~~~~
 TuyaMCU 12,101
 ~~~~
-this maps 'Relay2' (fnId 12) to dpId 101 (Go Home)
+this maps 'Relay3' (fnId 13) to dpId 103 (Locate Mode)
 ~~~~
 TuyaMCU 13,103
 ~~~~
-this maps 'Relay3' (fnId 13) to dpId 103 (Locate Mode)
+this maps 'Power' (fnId 31) to dpId 104 (Battery Percentage)
+this shows up in HA as power in watts, when actually its battery % divided by 10.
+
 ~~~~
 TuyaMCU 31,104
 ~~~~
-this maps 'Power' (fnId 31) to dpId 104 (Battery Percentage)
-this shows up in HA as power in watts, when actually its battery % divided by 10.
 
 if you encounter any issues check the tasmota console, enable verbose log
 weblog 4
