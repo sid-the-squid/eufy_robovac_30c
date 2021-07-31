@@ -231,6 +231,9 @@ text_sensor:
   - platform: template
     name: "robot status"
     lambda: |-
+      if (id(Eufy_30c_error_codes).state >0){
+        return {"ERROR! help the robot!"};
+      }
       if (id(Eufy_30c_status).state ==0){
         return {"cleaning"};
       }
@@ -245,9 +248,6 @@ text_sensor:
       }
       if (id(Eufy_30c_status).state ==4){
         return {"fully charged"};
-      }
-      if (id(Eufy_30c_error_codes).state >0){
-        return {"ERROR! help the robot!"};
       }
 
     update_interval: 5s
