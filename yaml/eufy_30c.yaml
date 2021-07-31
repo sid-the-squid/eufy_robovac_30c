@@ -81,8 +81,10 @@ sensor:
       # status 0 = no error
       # status 1 = 
       # status 2 = 
-      # status 3 = cliff/edge error?
+      # status 3 = cliff/edge error
       # status 4 = 
+      # status 5 = left wheel stuck
+      # status 6 = left brush stuck
 
 # the simple binary switches are easy
 switch:
